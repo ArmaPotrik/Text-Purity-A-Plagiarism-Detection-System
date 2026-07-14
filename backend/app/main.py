@@ -1,38 +1,54 @@
-import loguru
+# app/main.py
+
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.routes import router as api_router
 from app.api.auth import router as auth_router
-from app.api.users import router as users_router
 from app.core.db import engine
 from app.models.base import Base
 
 
-app = FastAPI()
+# ==========================
+# LIFESPAN (DB INIT)
+# ==========================
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
-# CORS Middleware
+
+app = FastAPI(lifespan=lifespan)
+
+
+# ==========================
+# CORS
+# ==========================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],  # adjust if needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(api_router, prefix="/api/v1", tags=["plagiarism"])
-app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
-app.include_router(users_router, prefix="/api/v1", tags=["users"])
+
+# ==========================
+# ROUTERS
+# ==========================
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(api_router, prefix="/api/v1")
 
 
-@app.on_event("startup")
-async def startup_event():
-    loguru.logger.info("Starting up...")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# ==========================
+# ROOT ENDPOINTS
+# ==========================
+@app.get("/")
+async def root():
+    return {"message": "Server is running!"}
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    loguru.logger.info("Shutting down...")
 
 @app.get("/health")
 async def health_check():

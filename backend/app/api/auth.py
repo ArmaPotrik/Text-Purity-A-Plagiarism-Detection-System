@@ -1,38 +1,50 @@
-from fastapi_users import FastAPIUsers
-from app.models.user import User
-from app.core.db import get_user_db
-from app.core.auth import auth_backend
+# app/api/auth.py
+
 from fastapi import APIRouter
-import uuid
-from app.schemas import UserRead, UserCreate
 
-fastapi_users = FastAPIUsers[User, uuid.UUID](
-    get_user_db,
-    [auth_backend],
-)
+from app.core.auth import fastapi_users, auth_backend
+from app.schemas import UserRead, UserCreate, UserUpdate
 
-router = APIRouter()
 
+router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+# =========================
+# LOGIN / LOGOUT (JWT)
+# =========================
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth/jwt",
-    tags=["auth"],
+    prefix="/jwt",
 )
 
+
+# =========================
+# REGISTER
+# =========================
 router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
-    tags=["auth"],
 )
 
+
+# =========================
+# USERS MANAGEMENT
+# =========================
+router.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+)
+
+
+# =========================
+# RESET PASSWORD
+# =========================
 router.include_router(
     fastapi_users.get_reset_password_router(),
-    prefix="/auth",
-    tags=["auth"],
 )
 
+
+# =========================
+# VERIFY USER
+# =========================
 router.include_router(
     fastapi_users.get_verify_router(UserRead),
-    prefix="/auth",
-    tags=["auth"],
 )

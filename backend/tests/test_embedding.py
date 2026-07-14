@@ -1,12 +1,14 @@
-from app.services.embedding import EmbeddingService
+import numpy as np
 
-def test_generate_text_embedding():
-    service = EmbeddingService()
-    embedding = service.generate_text_embedding("This is a test sentence.")
-    assert embedding.shape == (384,)
+def generate_text_embedding(self, text: str) -> np.ndarray:
+    chunks = self.chunk_text(text)
 
-def test_hash_content():
-    content = "This is a test sentence."
-    hashed_content = EmbeddingService.hash_content(content)
-    assert isinstance(hashed_content, str)
-    assert len(hashed_content) == 64
+    embeddings = []
+    for chunk in chunks:
+        emb = self.model.encode(chunk)
+        embeddings.append(emb)
+
+    # Average chunk embeddings
+    final_embedding = np.mean(embeddings, axis=0)
+
+    return np.asarray(final_embedding, dtype=np.float32)

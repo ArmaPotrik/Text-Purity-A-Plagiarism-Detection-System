@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+// ...existing code...
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -11,28 +12,41 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setIsLoading(true);
+  e.preventDefault();
+  setError(null);
+  setIsLoading(true);
 
-        try {
-            const response = await fetch('/api/v1/auth/jwt/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ username: email, password }),
-            });
-
-            if (!response.ok) throw new Error('Login failed');
-
-            const data = await response.json();
-            login(data.access_token);
-            navigate('/dashboard');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
+  try {
+    const response = await fetch(
+             "http://127.0.0.1:8000/api/v1/auth/jwt/login",
+         {
+             method: "POST",
+             headers: { "Content-Type": "application/x-www-form-urlencoded" },
+             body: new URLSearchParams({
+             username: email,
+             password,
+          }),
         }
-    };
+            );
+
+
+    if (!response.ok) {
+      throw new Error('Invalid email or password');
+    }
+
+    const data = await response.json();
+
+    // ✅ STORE TOKEN
+    login(data.access_token);
+
+    navigate('/dashboard');
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>

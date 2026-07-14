@@ -1,33 +1,42 @@
-import { useState, useEffect, ReactNode } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import { ReactNode, useEffect, useState } from "react";
+import { AuthContext } from "../contexts/AuthContext";
+
+const TOKEN_KEY = "access_token";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Restore token on refresh
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem(TOKEN_KEY);
     if (storedToken) {
       setToken(storedToken);
-      setIsAuthenticated(true);
     }
+    setLoading(false);
   }, []);
 
   const login = (newToken: string) => {
-    localStorage.setItem('token', newToken);
+    localStorage.setItem(TOKEN_KEY, newToken);
     setToken(newToken);
-    setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem(TOKEN_KEY);
     setToken(null);
-    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: !!token,
+        token,
+        login,
+        logout,
+        loading,
+      }}
+    >
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

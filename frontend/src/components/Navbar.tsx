@@ -25,7 +25,7 @@ const Navbar = () => {
             <span style={{ fontSize: '18px' }}>🛡️</span>
           </div>
           <span className="text-gradient" style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.02em' }}>
-            PlagDetect
+            Text-Purity
           </span>
         </Link>
 

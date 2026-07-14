@@ -1,6 +1,6 @@
 import uuid
-from sqlalchemy import Column, ForeignKey, String, DateTime, func, UUID
-from pgvector.sqlalchemy import Vector
+from sqlalchemy import Column, ForeignKey, String, DateTime, func, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from .base import Base
 
 class Embedding(Base):
@@ -8,6 +8,6 @@ class Embedding(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     file_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False)
-    vector = Column(Vector(384), nullable=False)
+    vector = Column(JSON, nullable=False)  # changed from Vector(384) to JSON for SQLite
     type = Column(String, nullable=False)  # 'text' or 'image'
     created_at = Column(DateTime(timezone=True), server_default=func.now())

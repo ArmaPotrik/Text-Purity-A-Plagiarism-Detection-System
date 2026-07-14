@@ -1,13 +1,19 @@
-import uuid
-from sqlalchemy import Column, String, DateTime, func, UUID
-from .base import Base
+# app/models/user.py
 
-class User(Base):
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
+
+from app.models.base import Base
+
+
+class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    role = Column(String, nullable=False, default="user")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # Additional custom field
+    role: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+        default="user",
+    )

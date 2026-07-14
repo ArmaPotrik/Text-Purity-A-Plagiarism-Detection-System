@@ -1,11 +1,26 @@
+# app/schemas.py
+
 import uuid
+from typing import Optional
 from fastapi_users import schemas
 
+
+# ==========================
+# USER READ (Response Model)
+# ==========================
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    pass
+    role: str
 
+
+# ==========================
+# USER CREATE (Register)
+# ==========================
 class UserCreate(schemas.BaseUserCreate):
-    pass
+    role: Optional[str] = "user"
 
+
+# ==========================
+# USER UPDATE
+# ==========================
 class UserUpdate(schemas.BaseUserUpdate):
-    pass
+    role: Optional[str] = None
