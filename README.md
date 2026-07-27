@@ -1,4 +1,4 @@
-# Text Purity — Plagiarism & AI-Content Detection System
+# Text Purity — Plagiarism Detection System
 
 Text Purity is an **offline-first plagiarism and AI-generated content detection platform**. It combines classic NLP techniques (TF-IDF, cosine similarity) with transformer-based models (Sentence-BERT, Hugging Face classifiers) to flag copied, paraphrased, and AI-written text — without ever sending documents to an external server.
 
